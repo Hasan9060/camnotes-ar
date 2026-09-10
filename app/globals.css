@@ -1,0 +1,56 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --font-poppins: 'Poppins', sans-serif;
+  --font-montserrat: 'Montserrat', sans-serif;
+  --color-blue-primary: #2563EB;
+  --color-blue-hover: #1D4ED8;
+  --color-blue-dark: #1E3A8A;
+  --color-yellow-primary: #FACC15;
+  --color-yellow-hover: #EAB308;
+  --color-yellow-light: #FEF08A;
+}
+
+body {
+  font-family: var(--font-poppins);
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-montserrat);
+}
+
+/* Light mode text strictly solid black */
+html:not(.dark) body {
+  color: #000000 !important;
+  background-color: #F8FAFC !important;
+}
+
+html.dark body {
+  color: #F8FAFC !important;
+  background-color: #0F172A !important;
+}
+
+/* Custom scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 9999px;
+}
+
+html.dark ::-webkit-scrollbar-thumb {
+  background: #334155;
+}
