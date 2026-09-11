@@ -54,3 +54,61 @@ html.dark body {
 html.dark ::-webkit-scrollbar-thumb {
   background: #334155;
 }
+
+/* Keyframe Animations for Modern Web Experience */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes floatGlow {
+  0%, 100% {
+    transform: translateY(0px);
+    box-shadow: 0 10px 30px -10px rgba(37, 99, 235, 0.3);
+  }
+  50% {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 40px -10px rgba(250, 204, 21, 0.4);
+  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 1;
+    filter: drop-shadow(0 0 10px rgba(250, 204, 21, 0.8));
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+.animate-floatGlow {
+  animation: floatGlow 4s ease-in-out infinite;
+}
+
+.animate-pulseGlow {
+  animation: pulseGlow 2s ease-in-out infinite;
+}
+
+/* 3D Flip Styles */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.transform-style-3d {
+  transform-style: preserve-3d;
+}
+
+.rotate-y-180 {
+  transform: rotateY(180deg);
+}

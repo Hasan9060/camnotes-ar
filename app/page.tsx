@@ -26,7 +26,8 @@ import {
   Eye,
   CheckCircle,
   X,
-  ZoomIn
+  ZoomIn,
+  Menu
 } from "lucide-react";
 
 export default function CamNotesApp() {
@@ -41,6 +42,25 @@ export default function CamNotesApp() {
   const [mathSolution, setMathSolution] = useState<string>("");
   const [quizScore, setQuizScore] = useState<number>(0);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
+
+  // Sequence Preloader Loading Screen State
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [loadingStep, setLoadingStep] = useState<number>(1);
+
+  // Initial Sequence Preloader Effect
+  useEffect(() => {
+    const timer1 = setTimeout(() => setLoadingStep(2), 600);
+    const timer2 = setTimeout(() => setLoadingStep(3), 1200);
+    const timer3 = setTimeout(() => setIsLoading(false), 1800);
+    return () => {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+      clearTimeout(timer3);
+    };
+  }, []);
+
+  // Mobile Drawer State
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
   
   // Lightbox Modal State
   const [lightboxImage, setLightboxImage] = useState<{ src: string; title: string } | null>(null);
@@ -179,10 +199,92 @@ export default function CamNotesApp() {
     }
   };
 
+  // RENDER SEQUENTIAL PRELOADER LOADING SCREEN IF ISLOADING IS TRUE
+  if (isLoading) {
+    return (
+      <div className="fixed inset-0 z-50 bg-slate-950 flex flex-col items-center justify-center p-6 text-white font-sans overflow-hidden">
+        {/* AMBIENT BACKGROUND GLOW */}
+        <div className="absolute w-96 h-96 bg-blue-600/20 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute w-80 h-80 bg-yellow-400/10 rounded-full blur-3xl animate-pulse delay-700" />
+
+        <div className="relative z-10 flex flex-col items-center max-w-md w-full text-center space-y-8 animate-fadeIn">
+          {/* BRAND LOGO */}
+          <div className="relative">
+            <img
+              src="/logo.jpg"
+              alt="CamNotes AR Logo"
+              className="w-24 h-24 rounded-3xl object-cover border-2 border-yellow-400 shadow-2xl animate-floatGlow"
+            />
+            <div className="absolute -bottom-2 -right-2 bg-blue-600 p-2 rounded-xl border border-yellow-400 shadow-lg">
+              <Zap className="w-5 h-5 text-yellow-400 animate-pulse" />
+            </div>
+          </div>
+
+          {/* BRAND TITLE */}
+          <div className="space-y-1">
+            <h1 className="text-3xl font-extrabold tracking-tight text-white">
+              CamNotes <span className="text-yellow-400">AR</span>
+            </h1>
+            <p className="text-xs text-blue-400 font-extrabold uppercase tracking-widest">
+              Silicon Squad Vision Engine
+            </p>
+          </div>
+
+          {/* SEQUENTIAL PROGRESS STEPPER */}
+          <div className="w-full space-y-3 bg-slate-900/80 p-5 rounded-2xl border border-slate-800 backdrop-blur-md shadow-xl text-left">
+            <div className="flex items-center justify-between text-xs font-semibold">
+              <span className="flex items-center gap-2 text-slate-300">
+                <span className={`w-2 h-2 rounded-full ${loadingStep >= 1 ? "bg-green-400 animate-pulse" : "bg-slate-600"}`} />
+                Initializing Vision Telemetry Engine...
+              </span>
+              {loadingStep >= 1 && <span className="text-green-400 font-bold">100%</span>}
+            </div>
+
+            <div className="flex items-center justify-between text-xs font-semibold">
+              <span className="flex items-center gap-2 text-slate-300">
+                <span className={`w-2 h-2 rounded-full ${loadingStep >= 2 ? "bg-yellow-400 animate-pulse" : "bg-slate-600"}`} />
+                Loading Multimodal Gemini 3.6 Models...
+              </span>
+              {loadingStep >= 2 ? <span className="text-yellow-400 font-bold">Ready</span> : <span className="text-slate-600">Pending</span>}
+            </div>
+
+            <div className="flex items-center justify-between text-xs font-semibold">
+              <span className="flex items-center gap-2 text-slate-300">
+                <span className={`w-2 h-2 rounded-full ${loadingStep >= 3 ? "bg-blue-400 animate-pulse" : "bg-slate-600"}`} />
+                Configuring Interactive Workspaces...
+              </span>
+              {loadingStep >= 3 ? <span className="text-blue-400 font-bold">Done</span> : <span className="text-slate-600">Pending</span>}
+            </div>
+
+            {/* PROGRESS BAR */}
+            <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden mt-4">
+              <div
+                className="h-full bg-gradient-to-r from-blue-600 to-yellow-400 transition-all duration-500 ease-out"
+                style={{ width: `${(loadingStep / 3) * 100}%` }}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex h-screen w-full overflow-hidden font-sans">
-      {/* SIDEBAR - DYNAMIC LIGHT / DARK THEME */}
-      <aside className="w-64 bg-white dark:bg-slate-900 text-black dark:text-white flex flex-col border-r border-slate-200 dark:border-slate-800 shadow-xl shrink-0 transition-colors duration-200">
+    <div className="flex h-screen w-full overflow-hidden font-sans relative">
+      {/* MOBILE BACKDROP OVERLAY */}
+      {isMobileMenuOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-slate-950/60 backdrop-blur-sm md:hidden"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
+      {/* SIDEBAR - RESPONSIVE SLIDE-OVER DRAWER ON MOBILE */}
+      <aside
+        className={`fixed md:relative z-50 md:z-auto h-full w-64 bg-white dark:bg-slate-900 text-black dark:text-white flex flex-col border-r border-slate-200 dark:border-slate-800 shadow-xl shrink-0 transition-transform duration-300 ease-in-out ${
+          isMobileMenuOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+        }`}
+      >
         {/* SAAS BRAND LOGO HEADER */}
         <div className="p-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between transition-colors duration-200">
           <div className="flex items-center gap-3">
@@ -196,12 +298,22 @@ export default function CamNotesApp() {
               <p className="text-[10px] text-blue-600 dark:text-yellow-400 font-extrabold uppercase tracking-wider">Silicon Squad</p>
             </div>
           </div>
+          {/* CLOSE DRAWER ON MOBILE */}
+          <button
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="md:hidden text-slate-400 hover:text-slate-600 dark:hover:text-white p-1 rounded-lg"
+          >
+            <X className="w-5 h-5" />
+          </button>
         </div>
 
         {/* NAVIGATION LINKS */}
         <nav className="flex-1 p-4 space-y-1.5 overflow-y-auto">
           <button
-            onClick={() => setActiveTab("camera")}
+            onClick={() => {
+              setActiveTab("camera");
+              setIsMobileMenuOpen(false);
+            }}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
               activeTab === "camera"
                 ? "bg-blue-600 text-white shadow-md shadow-blue-600/20 font-semibold"
@@ -213,7 +325,10 @@ export default function CamNotesApp() {
           </button>
 
           <button
-            onClick={() => setActiveTab("hud")}
+            onClick={() => {
+              setActiveTab("hud");
+              setIsMobileMenuOpen(false);
+            }}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
               activeTab === "hud"
                 ? "bg-blue-600 text-white shadow-md shadow-blue-600/20 font-semibold"
@@ -225,7 +340,10 @@ export default function CamNotesApp() {
           </button>
 
           <button
-            onClick={() => setActiveTab("notes")}
+            onClick={() => {
+              setActiveTab("notes");
+              setIsMobileMenuOpen(false);
+            }}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
               activeTab === "notes"
                 ? "bg-blue-600 text-white shadow-md shadow-blue-600/20 font-semibold"
@@ -237,7 +355,10 @@ export default function CamNotesApp() {
           </button>
 
           <button
-            onClick={() => setActiveTab("flashcards")}
+            onClick={() => {
+              setActiveTab("flashcards");
+              setIsMobileMenuOpen(false);
+            }}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
               activeTab === "flashcards"
                 ? "bg-blue-600 text-white shadow-md shadow-blue-600/20 font-semibold"
@@ -249,7 +370,10 @@ export default function CamNotesApp() {
           </button>
 
           <button
-            onClick={() => setActiveTab("quiz")}
+            onClick={() => {
+              setActiveTab("quiz");
+              setIsMobileMenuOpen(false);
+            }}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
               activeTab === "quiz"
                 ? "bg-blue-600 text-white shadow-md shadow-blue-600/20 font-semibold"
@@ -261,7 +385,10 @@ export default function CamNotesApp() {
           </button>
 
           <button
-            onClick={() => setActiveTab("history")}
+            onClick={() => {
+              setActiveTab("history");
+              setIsMobileMenuOpen(false);
+            }}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
               activeTab === "history"
                 ? "bg-blue-600 text-white shadow-md shadow-blue-600/20 font-semibold"
@@ -273,7 +400,10 @@ export default function CamNotesApp() {
           </button>
 
           <button
-            onClick={() => setActiveTab("about")}
+            onClick={() => {
+              setActiveTab("about");
+              setIsMobileMenuOpen(false);
+            }}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
               activeTab === "about"
                 ? "bg-blue-600 text-white shadow-md shadow-blue-600/20 font-semibold"
@@ -287,7 +417,10 @@ export default function CamNotesApp() {
           {/* CONDITIONAL TAB: MATH SOLVER */}
           {showMathSolver && (
             <button
-              onClick={() => setActiveTab("math")}
+              onClick={() => {
+                setActiveTab("math");
+                setIsMobileMenuOpen(false);
+              }}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all border border-yellow-500/40 ${
                 activeTab === "math"
                   ? "bg-yellow-500 text-slate-900 shadow-md font-bold"
@@ -340,9 +473,17 @@ export default function CamNotesApp() {
       {/* MAIN CONTENT WORKSPACE */}
       <main className="flex-1 flex flex-col overflow-y-auto bg-slate-50 dark:bg-slate-900 text-black dark:text-slate-100 transition-colors duration-200">
         {/* HEADER BAR */}
-        <header className="h-16 border-b border-slate-200 dark:border-slate-800 px-8 flex items-center justify-between bg-white dark:bg-slate-900 shadow-sm shrink-0 transition-colors duration-200">
+        <header className="h-16 border-b border-slate-200 dark:border-slate-800 px-4 md:px-8 flex items-center justify-between bg-white dark:bg-slate-900 shadow-sm shrink-0 transition-colors duration-200">
           <div className="flex items-center gap-3">
-            <h2 className="text-xl font-bold text-black dark:text-white capitalize">
+            {/* MOBILE HAMBURGER MENU TOGGLE */}
+            <button
+              onClick={() => setIsMobileMenuOpen(true)}
+              className="md:hidden p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-white hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+
+            <h2 className="text-lg md:text-xl font-bold text-black dark:text-white capitalize truncate max-w-[160px] sm:max-w-none">
               {activeTab === "hud" ? "AR HUD Overlay" : activeTab === "math" ? "Step-by-Step Math Solver" : activeTab === "about" ? "About Us - Silicon Squad" : `${activeTab} Workspace`}
             </h2>
           </div>
